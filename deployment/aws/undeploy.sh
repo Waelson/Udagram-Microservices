@@ -11,10 +11,6 @@ echo "___| Deleting Reverse Proxy |___"
 kubectl delete -f ../reverseproxy-service.yaml
 kubectl delete -f ../reverseproxy-deployment.yaml 
 
-echo "___| Deleting Reverse Proxy |___"
-kubectl delete -f ../reverseproxy-service.yaml
-kubectl delete -f ../reverseproxy-deployment.yaml 
-
 echo "___| Deleting RestAPI Feed |___"
 kubectl delete -f ../restapi-feed-service.yaml
 kubectl delete -f ../restapi-feed-deployment.yaml 
