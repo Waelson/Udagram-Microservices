@@ -1,4 +1,4 @@
-language: minimal
+language: python
 
 services: docker
 
@@ -14,16 +14,23 @@ before_install:
   - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
   - sudo mv ./kubectl /usr/local/bin/kubectl
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - sudo ./aws/install
+  - chmod +x deployment/aws/ecr_credentials.sh
+  - ./deployment/aws/ecr_credentials.sh
 
 
 install:
   - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
   - echo $DOCKER_HUB_PASSWORD | docker login --username $user --password-stdin && \
   - docker-compose -f deployment/docker/docker-compose-build.yaml push
+  - aws eks update-kubeconfig --name my-cluster --region us-west-2
 
 
-config_kubeconfig:
-  - aws eks update-kubeconfig --name mycluster --region us-west-2
+deploy:
+  - kubectl apply -f ./deployment/k8s/
+  -   
 
 
 
