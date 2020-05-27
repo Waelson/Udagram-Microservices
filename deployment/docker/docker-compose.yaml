@@ -1,0 +1,43 @@
+version: "3"
+services:
+  reverseproxy:
+    image: thedevices/udagram-reverseproxy
+    ports:
+      - "8080:8080"
+    depends_on:
+      - restapi-user
+      - restapi-feed
+  restapi-user:
+    image: thedevices/udagram-restapi-user
+    #ports:
+    #  - "8080:8080"    
+    volumes:
+      - $HOME/.aws:/root/.aws
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD 
+      POSTGRES_DATABASE: $POSTGRES_DATABASE 
+      POSTGRES_HOST: $POSTGRES_HOST 
+      AWS_REGION: $AWS_REGION 
+      AWS_PROFILE: $AWS_PROFILE 
+      AWS_MEDIA_BUCKET: $AWS_MEDIA_BUCKET
+  restapi-feed:
+    image: thedevices/udagram-restapi-feed
+    #ports:
+    #  - "8080:8080"    
+    volumes:
+      - $HOME/.aws:/root/.aws
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD 
+      POSTGRES_DATABASE: $POSTGRES_DATABASE 
+      POSTGRES_HOST: $POSTGRES_HOST 
+      AWS_REGION: $AWS_REGION 
+      AWS_PROFILE: $AWS_PROFILE 
+      AWS_MEDIA_BUCKET: $AWS_MEDIA_BUCKET      
+  frontend:
+    image: thedevices/udagram-frontend
+    ports:
+      - "8100:80"
+    depends_on:
+      - reverseproxy

@@ -1,0 +1,18 @@
+version: "3"
+services:
+ restapi-user:
+  build:
+    context: ../../udagram-restapi-user
+  image: thedevices/udagram-restapi-user
+ restapi-feed:
+  build:
+    context: ../../udagram-restapi-feed
+  image: thedevices/udagram-restapi-feed
+ frontend:
+  build:
+    context: ../../udagram-frontend
+  image: thedevices/udagram-frontend
+ reverseproxy:
+  build:
+    context: ../../udagram-reverseproxy
+  image: thedevices/udagram-reverseproxy

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  AWS_MEDIA_BUCKET: udagram-waelson-dev
+  AWS_PROFILE: K8S
+  AWS_REGION: us-west-2
+  POSTGRES_DATABASE: udagram
+  POSTGRES_HOST: udagram-waelson-dev.ckacws8mpd1b.us-west-2.rds.amazonaws.com
+metadata:
+  name: env-config

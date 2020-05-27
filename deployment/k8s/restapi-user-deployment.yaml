@@ -1,0 +1,77 @@
+#apiVersion: extensions/v1beta1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restapi-user
+  labels:
+    service: restapi-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: restapi-user  
+  template:
+    metadata:
+      labels:
+        service: restapi-user
+    spec:
+      containers:
+      - image: thedevices/udagram-restapi-user:latest
+        name: restapi-user
+        imagePullPolicy: Always  
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"      
+        env:
+        - name: AWS_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_PROFILE        
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_REGION    
+        - name: AWS_MEDIA_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: AWS_MEDIA_BUCKET                     
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: POSTGRES_DATABASE
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: env-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: POSTGRES_USER
+        - name: ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: ACCESS_KEY_ID
+        - name: SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: SECRET_ACCESS_KEY                            
+      restartPolicy: Always
+
+
