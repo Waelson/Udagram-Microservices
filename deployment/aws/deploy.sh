@@ -1,23 +1,23 @@
 #!/bin/bash
 echo "___| Applying Secrets and ConfigMap |___"
-kubectl apply -f ../env_secret_local.yaml
-kubectl apply -f ../env_configmap.yaml
+kubectl apply -f ../k8s/env_secret_local.yaml
+kubectl apply -f ../k8s/env_configmap.yaml
 
 echo "___| Applying Frontend |___"
-kubectl apply -f ../frontend-service.yaml
-kubectl apply -f ../frontend-deployment.yaml 
+kubectl apply -f ../k8s/frontend-service.yaml
+kubectl apply -f ../k8s/frontend-deployment.yaml 
 
 echo "___| Applying Reverse Proxy |___"
-kubectl apply -f ../reverseproxy-service.yaml
-kubectl apply -f ../reverseproxy-deployment.yaml 
+kubectl apply -f ../k8s/reverseproxy-service.yaml
+kubectl apply -f ../k8s/reverseproxy-deployment.yaml 
 
 echo "___| Applying RestAPI Feed |___"
-kubectl apply -f ../restapi-feed-service.yaml
-kubectl apply -f ../restapi-feed-deployment.yaml 
+kubectl apply -f ../k8s/restapi-feed-service.yaml
+kubectl apply -f ../k8s/restapi-feed-deployment.yaml 
 
 echo "___| Applying RestAPI User |___"
-kubectl apply -f ../restapi-user-service.yaml
-kubectl apply -f ../restapi-user-deployment.yaml 
+kubectl apply -f ../k8s/restapi-user-service.yaml
+kubectl apply -f ../k8s/restapi-user-deployment.yaml 
 
 echo "___| Rolling out Frontend |___"
 kubectl set image deployments/frontend frontend=thedevices/udagram-frontend:latest
