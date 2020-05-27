@@ -1,2 +1,2 @@
 #!/bin/bash
-eksctl delete cluster --name my-cluster --region us-west-2
+eksctl delete cluster --name mycluster --region us-west-2
