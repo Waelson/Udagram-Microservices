@@ -29,8 +29,15 @@ install:
 
 
 deploy:
-  - kubectl apply -f ./deployment/k8s/
-  -   
+  - kubectl apply -f ./deployment/k8s/  
+  - kubectl set image deployments/frontend-deployment frontend=thedevices/udagram-frontend:latest
+  - kubectl rollout status deployments/frontend-deployment
+  - kubectl set image deployments/reverseproxy reverseproxy=thedevices/udagram-reverseproxy:latest
+  - kubectl rollout status deployments/reverseproxy
+  - kubectl set image deployments/restapi-feed restapi-feed=thedevices/udagram-restapi-feed:latest
+  - kubectl rollout status deployments/restapi-feed
+  - kubectl set image deployments/restapi-user restapi-user=thedevices/udagram-restapi-user:latest
+  - kubectl rollout status deployments/restapi-user    
 
 
 
