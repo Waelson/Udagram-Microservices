@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose -f ../docker-compose-build.yaml build --parallel
+docker-compose -f ../docker-compose-build.yaml build --parallel --no-cache
