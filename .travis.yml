@@ -23,7 +23,7 @@ before_install:
 
 install:
   - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
-  - echo $DOCKER_HUB_PASSWORD | docker login --username $user --password-stdin && \
+  - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
   - docker-compose -f deployment/docker/docker-compose-build.yaml push
   - aws eks update-kubeconfig --name mycluster --region us-west-2
 
