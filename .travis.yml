@@ -25,11 +25,11 @@ install:
   - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
   - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
   - docker-compose -f deployment/docker/docker-compose-build.yaml push
-  #- aws eks update-kubeconfig --name mycluster --region us-west-2
+  - aws eks update-kubeconfig --name mycluster --region us-west-2
 
-#deploy:
-#  - chmod +x deployment/aws/deploy.sh
-#  - ./deployment/aws/deploy.sh
+deploy:
+  - chmod +x deployment/aws/deploy.sh
+  - ./deployment/aws/deploy.sh
 
 
 
