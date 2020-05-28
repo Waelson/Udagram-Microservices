@@ -7,44 +7,48 @@ import * as jwt from 'jsonwebtoken';
 import { NextFunction } from 'connect';
 
 import * as EmailValidator from 'email-validator';
+import { stringify } from 'querystring';
+import { config } from '../../../../config/config';
+
+const c = config.dev
 
 const router: Router = Router();
 
 async function generatePassword(plainTextPassword: string): Promise<string> {
-    return null;
-    //@TODO Use Bcrypt to Generated Salted Hashed Passwords
+    const rounds = 10;
+    const salt = await bcrypt.genSalt(rounds);
+    const hash = await bcrypt.hash(plainTextPassword, salt);
+    return hash;
 }
 
 async function comparePasswords(plainTextPassword: string, hash: string): Promise<boolean> {
-    return null;
-    //@TODO Use Bcrypt to Compare your password to your Salted Hashed Password
+    return bcrypt.compare(plainTextPassword, hash);
 }
 
 function generateJWT(user: User): string {
-    return null;
-    //@TODO Use jwt to create a new JWT Payload containing
+    return jwt.sign(JSON.stringify(user), "hello");
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return next();
-    // if (!req.headers || !req.headers.authorization){
-    //     return res.status(401).send({ message: 'No authorization headers.' });
-    // }
+     if (!req.headers || !req.headers.authorization){
+        return res.status(401).send({ message: 'No authorization headers.' });
+     }
     
 
-    // const token_bearer = req.headers.authorization.split(' ');
-    // if(token_bearer.length != 2){
-    //     return res.status(401).send({ message: 'Malformed token.' });
-    // }
+     const token_bearer = req.headers.authorization.split(' ');
+     if(token_bearer.length != 2){
+         return res.status(401).send({ message: 'Malformed token.' });
+     }
     
-    // const token = token_bearer[1];
+     const token = token_bearer[1];
 
-    // return jwt.verify(token, "hello", (err, decoded) => {
-    //   if (err) {
-    //     return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
-    //   }
-    //   return next();
-    // });
+     return jwt.verify(token, "hello", (err, decoded) => {
+       if (err) {
+         return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
+       }
+       return next();
+     });
 }
 
 router.get('/verification', 
@@ -105,13 +109,16 @@ router.post('/', async (req: Request, res: Response) => {
     if(user) {
         return res.status(422).send({ auth: false, message: 'User may already exist' });
     }
-
+    console.log(plainTextPassword)
     const password_hash = await generatePassword(plainTextPassword);
 
     const newUser = await new User({
         email: email,
         password_hash: password_hash
     });
+
+    console.log(email)
+    console.log(password_hash)
 
     let savedUser;
     try {
@@ -122,6 +129,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     // Generate JWT
     const jwt = generateJWT(savedUser);
+    console.log(jwt)
 
     res.status(201).send({token: jwt, user: savedUser.short()});
 });
