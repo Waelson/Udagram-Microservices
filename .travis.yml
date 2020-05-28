@@ -5,7 +5,8 @@ services: docker
 env:
   - DOCKER_COMPOSE_VERSION=1.23.2
 
-before_install:
+
+before_script:
   - docker -v && docker-compose -v
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
@@ -17,20 +18,26 @@ before_install:
   - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   - unzip awscliv2.zip
   - sudo ./aws/install
+
+script:
+  #- docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
+  - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
+  #- docker-compose -f deployment/docker/docker-compose-build.yaml push
+
+
+before_deploy:
   - chmod +x deployment/aws/ecr_credentials.sh
   - ./deployment/aws/ecr_credentials.sh
-
-
-install:
-  - echo "Installing"
-  #- docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
-  #- echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
-  #- docker-compose -f deployment/docker/docker-compose-build.yaml push
-  #- aws eks update-kubeconfig --name mycluster --region us-west-2
+  - aws eks update-kubeconfig --name mycluster --region us-west-2  
 
 deploy:
   - chmod +x deployment/aws/deploy.sh
   - ./deployment/aws/deploy.sh
 
-
+notifications:
+  email:
+    recipients:
+      - waelson@gmail.com
+    on_success: always
+    on_failure: always
 
