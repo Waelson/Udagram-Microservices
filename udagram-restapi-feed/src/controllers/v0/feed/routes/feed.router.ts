@@ -14,8 +14,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
          return res.status(401).send({ message: 'No authorization headers.' });
     }
     
-
     const token_bearer = req.headers.authorization.split(' ');
+    
+    console.log(req.headers.authorization);
+
     if(token_bearer.length != 2){
         return res.status(401).send({ message: 'Malformed token.' });
     }
@@ -23,10 +25,10 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     const token = token_bearer[1];
 
     return jwt.verify(token, c.jwt, (err, decoded) => {
-    if (err) {
-        return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
-       }
-       return next();
+        if (err) {
+            return res.status(500).send({ auth: false, message: 'Failed to authenticate.' });
+        }
+        return next();
     });
 }
 
