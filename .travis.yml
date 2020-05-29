@@ -8,7 +8,7 @@ env:
 jobs:
   include:
     - stage: build
-      before_script:
+      script:
         - docker -v && docker-compose -v
         - sudo rm /usr/local/bin/docker-compose
         - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
