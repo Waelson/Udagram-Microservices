@@ -20,14 +20,13 @@ before_script:
   - sudo ./aws/install
 
 script:
-  #- docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
+  - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
   - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
-  #- docker-compose -f deployment/docker/docker-compose-build.yaml push
+  - docker-compose -f deployment/docker/docker-compose-build.yaml push
   - chmod +x deployment/aws/ecr_credentials.sh
   - ./deployment/aws/ecr_credentials.sh
   - aws eks update-kubeconfig --name mycluster --region us-west-2  
-  #- chmod +x deployment/aws/deploy.sh
-  #- ./deployment/aws/deploy.sh
+
   - kubectl apply -f deployment/k8s/env_secret.yaml
   - kubectl apply -f deployment/k8s/env_configmap.yaml
 
