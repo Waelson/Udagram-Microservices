@@ -5,60 +5,64 @@ services: docker
 env:
   - DOCKER_COMPOSE_VERSION=1.23.2
 
+jobs:
+  include:
+    - stage: build
+      before_script:
+        - docker -v && docker-compose -v
+        - sudo rm /usr/local/bin/docker-compose
+        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+        - chmod +x docker-compose
+        - sudo mv docker-compose /usr/local/bin
+        - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+        - chmod +x ./kubectl
+        - sudo mv ./kubectl /usr/local/bin/kubectl
+        - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        - unzip awscliv2.zip
+        - sudo ./aws/install
 
-before_script:
-  - docker -v && docker-compose -v
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-  - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-  - chmod +x ./kubectl
-  - sudo mv ./kubectl /usr/local/bin/kubectl
-  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-  - unzip awscliv2.zip
-  - sudo ./aws/install
+        - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
+        - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
+        - docker-compose -f deployment/docker/docker-compose-build.yaml push        
 
-script:
-  - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
-  - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
-  - docker-compose -f deployment/docker/docker-compose-build.yaml push
-  - chmod +x deployment/aws/ecr_credentials.sh
-  - ./deployment/aws/ecr_credentials.sh
-  - aws eks update-kubeconfig --name mycluster --region us-west-2  
+    - stage: deploy      
+      script:
+        - chmod +x deployment/aws/ecr_credentials.sh
+        - ./deployment/aws/ecr_credentials.sh
+        - aws eks update-kubeconfig --name mycluster --region us-west-2  
 
-  - kubectl apply -f deployment/k8s/env_secret.yaml
-  - kubectl apply -f deployment/k8s/env_configmap.yaml
+        - kubectl apply -f deployment/k8s/env_secret.yaml
+        - kubectl apply -f deployment/k8s/env_configmap.yaml
 
-  - kubectl apply -f deployment/k8s/frontend-service.yaml
-  - kubectl apply -f deployment/k8s/frontend-deployment.yaml 
+        - kubectl apply -f deployment/k8s/frontend-service.yaml
+        - kubectl apply -f deployment/k8s/frontend-deployment.yaml 
 
-  - kubectl apply -f deployment/k8s/reverseproxy-service.yaml
-  - kubectl apply -f deployment/k8s/reverseproxy-deployment.yaml 
+        - kubectl apply -f deployment/k8s/reverseproxy-service.yaml
+        - kubectl apply -f deployment/k8s/reverseproxy-deployment.yaml 
 
-  - kubectl apply -f deployment/k8s/restapi-feed-service.yaml
-  - kubectl apply -f deployment/k8s/restapi-feed-deployment.yaml 
+        - kubectl apply -f deployment/k8s/restapi-feed-service.yaml
+        - kubectl apply -f deployment/k8s/restapi-feed-deployment.yaml 
 
-  - kubectl apply -f deployment/k8s/restapi-user-service.yaml
-  - kubectl apply -f deployment/k8s/restapi-user-deployment.yaml 
+        - kubectl apply -f deployment/k8s/restapi-user-service.yaml
+        - kubectl apply -f deployment/k8s/restapi-user-deployment.yaml 
 
-  - kubectl set image deployments/frontend frontend=thedevices/udagram-frontend:latest
-  - kubectl rollout status deployments/frontend
+        - kubectl set image deployments/frontend frontend=thedevices/udagram-frontend:latest
+        - kubectl rollout status deployments/frontend
 
-  - kubectl set image deployments/reverseproxy reverseproxy=thedevices/udagram-reverseproxy:latest
-  - kubectl rollout status deployments/reverseproxy
+        - kubectl set image deployments/reverseproxy reverseproxy=thedevices/udagram-reverseproxy:latest
+        - kubectl rollout status deployments/reverseproxy
 
-  - kubectl set image deployments/restapi-feed restapi-feed=thedevices/udagram-restapi-feed:latest
-  - kubectl rollout status deployments/restapi-feed
+        - kubectl set image deployments/restapi-feed restapi-feed=thedevices/udagram-restapi-feed:latest
+        - kubectl rollout status deployments/restapi-feed
 
-  - kubectl set image deployments/restapi-user restapi-user=thedevices/udagram-restapi-user:latest
-  - kubectl rollout status deployments/restapi-user   
+        - kubectl set image deployments/restapi-user restapi-user=thedevices/udagram-restapi-user:latest
+        - kubectl rollout status deployments/restapi-user   
 
 
-notifications:
-  email:
-    recipients:
-      - waelson@gmail.com
-    on_success: always
-    on_failure: always
+#notifications:
+#  email:
+#    recipients:
+#      - waelson@gmail.com
+#    on_success: always
+#    on_failure: always
 
