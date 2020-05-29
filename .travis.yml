@@ -14,9 +14,9 @@ jobs:
         - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
         - chmod +x docker-compose
         - sudo mv docker-compose /usr/local/bin
-        #- docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
+        - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
         - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
-        #- docker-compose -f deployment/docker/docker-compose-build.yaml push        
+        - docker-compose -f deployment/docker/docker-compose-build.yaml push        
 
     - stage: deploy      
       script:
@@ -29,7 +29,7 @@ jobs:
         - chmod +x deployment/aws/ecr_credentials.sh
         - ./deployment/aws/ecr_credentials.sh
         - aws eks update-kubeconfig --name mycluster --region us-west-2  
-        
+
         - kubectl apply -f deployment/k8s/env_secret.yaml
         - kubectl apply -f deployment/k8s/env_configmap.yaml
 
