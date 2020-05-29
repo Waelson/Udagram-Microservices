@@ -21,9 +21,9 @@ jobs:
         - unzip awscliv2.zip
         - sudo ./aws/install
 
-        - docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
+        #- docker-compose -f deployment/docker/docker-compose-build.yaml build --parallel 
         - echo ${PASS_DOCKERHUB} | docker login --username ${USER_DOCKERHUB} --password-stdin
-        - docker-compose -f deployment/docker/docker-compose-build.yaml push        
+        #- docker-compose -f deployment/docker/docker-compose-build.yaml push        
 
     - stage: deploy      
       script:
