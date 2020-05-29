@@ -28,7 +28,7 @@ script:
   - aws eks update-kubeconfig --name mycluster --region us-west-2  
   #- chmod +x deployment/aws/deploy.sh
   #- ./deployment/aws/deploy.sh
-  - kubectl apply -f deployment/k8s/env_secret_local.yaml
+  - kubectl apply -f deployment/k8s/env_secret.yaml
   - kubectl apply -f deployment/k8s/env_configmap.yaml
 
   - kubectl apply -f deployment/k8s/frontend-service.yaml
